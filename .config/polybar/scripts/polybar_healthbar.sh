@@ -12,7 +12,13 @@
 # Original idea for calculating the battery % is not mine, unfortunately
 # I don't remember the source.
 
-source ~/.config/polybar/scripts/colors.sh
+[ -f ~/.config/polybar/scripts/colors.sh ] && source ~/.config/polybar/scripts/colors.sh || true
+# fallbacks if colors.sh missing (headless test / koli fresh install before link)
+faded_green=${faded_green:-"%{F#7B8438}"}
+faded_yellow=${faded_yellow:-"%{F#D8AA32}"}
+faded_red=${faded_red:-"%{F#CF9722}"}
+dark0_soft=${dark0_soft:-"%{F#27332e}"}
+RESET=${RESET:-"%{F-}"}
 
 healthbar_print() {
 
@@ -49,8 +55,31 @@ healthbar_print() {
 	battery_level=$(("$battery_level_0 + $battery_level_1"))
 	battery_max=$(("$battery_max_0 + $battery_max_1"))
 
-	battery_percent=$(("$battery_level * 100"))
-	battery_percent=$(("$battery_percent / $battery_max"))
+	# no battery (desktop) or unreadable — avoid division by zero
+	if [ "$battery_max" -eq 0 ]; then
+		# try capacity fallback for desktops/odd hardware
+		if [ -f "$PATH_BATTERY_0/capacity" ]; then
+			battery_percent=$(cat "$PATH_BATTERY_0/capacity" 2>/dev/null)
+		elif [ -f "$PATH_BATTERY_1/capacity" ]; then
+			battery_percent=$(cat "$PATH_BATTERY_1/capacity" 2>/dev/null)
+		else
+			# desktop with no battery: show AC status quietly
+			if [ "$ac" -eq 1 ]; then
+				echo "${faded_green}${RESET} AC"
+			else
+				echo "${dark0_soft}AC${RESET}"
+			fi
+			return 0
+		fi
+		# if capacity read failed, fallback to AC
+		if ! echo "$battery_percent" | grep -qE '^[0-9]+$'; then
+			if [ "$ac" -eq 1 ]; then echo "${faded_green}${RESET} AC"; else echo "${dark0_soft}AC${RESET}"; fi
+			return 0
+		fi
+	else
+		battery_percent=$(("$battery_level * 100"))
+		battery_percent=$(("$battery_percent / $battery_max"))
+	fi
 
 	# notify-send "Battery below 90%"
 	# notify-send "$battery_percent"
