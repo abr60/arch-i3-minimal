@@ -12,6 +12,7 @@ ln -sfn "$REPO/.config/alacritty" ~/.config/alacritty
 ln -sfn "$REPO/.config/rofi" ~/.config/rofi
 ln -sfn "$REPO/.config/dunst" ~/.config/dunst
 ln -sfn "$REPO/.bashrc" ~/.bashrc
+ln -sfn "$REPO/.bash_profile" ~/.bash_profile
 ln -sfn "$REPO/.Xresources" ~/.Xresources
 ln -sfn "$REPO/.xinitrc" ~/.xinitrc
 chmod +x ~/.config/polybar/launch.sh ~/.config/rofi/menu.sh 2>/dev/null || true
