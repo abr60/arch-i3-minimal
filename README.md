@@ -27,7 +27,7 @@ Intel Iris Xe needs no extra driver (kernel `i915` built-in). No NVIDIA on this 
 ## 2. Get this repo + install
 ```bash
 sudo pacman -Syu git
-git clone <YOUR-REPO-URL> ~/arch-i3-minimal
+git clone https://github.com/abr60/arch-i3-minimal.git ~/arch-i3-minimal
 cd ~/arch-i3-minimal
 ./install.sh
 ./setup.sh
