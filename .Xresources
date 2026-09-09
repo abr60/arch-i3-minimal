@@ -1,8 +1,9 @@
-! arch-i3-minimal Xresources — ThinkPad T14 (14" 1080p/1440p safe)
-Xcursor.size: 24
-Xcursor.theme: Adwaita
+! arch-i3-minimal Xresources — ThinkPad T14 14" 1080p (~157 PPI)
+! Xft.dpi 113 scales GTK apps to match Omarchy's 1.6x feel on X11
+Xcursor.size: 28
+Xcursor.theme: Bibata-Original-Classic
 Xft.antialias: true
 Xft.hinting: true
 Xft.hintstyle: hintslight
 Xft.rgba: rgb
-Xft.dpi: 96
+Xft.dpi: 113

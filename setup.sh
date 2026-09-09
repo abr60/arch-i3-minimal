@@ -12,6 +12,6 @@ ln -sfn "$REPO/.config/dunst" ~/.config/dunst
 ln -sfn "$REPO/.bashrc" ~/.bashrc
 ln -sfn "$REPO/.Xresources" ~/.Xresources
 ln -sfn "$REPO/.xinitrc" ~/.xinitrc
-chmod +x ~/.config/polybar/launch.sh
+chmod +x ~/.config/polybar/launch.sh ~/.config/i3/powermenu.sh
 mkdir -p ~/Pictures
 echo "Linked. Run 'startx' to launch i3."

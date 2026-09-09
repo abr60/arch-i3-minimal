@@ -1,19 +1,27 @@
 configuration {
-  modi: "drun";
-  show-icons: false;
-  font: "JetBrainsMono Nerd Font 10";
+  modi: "drun,run,window,calc,emoji";
+  show-icons: true;
+  icon-theme: "Yaru-sage";
+  font: "JetBrainsMono Nerd Font 11";
   drun-display-format: "{name}";
+  display-drun: "Apps";
+  display-run: "Run";
+  display-window: "Windows";
+  display-calc: "Calc";
+  display-emoji: "Emoji";
+  calc-command: "echo -n '{result}' | xclip -selection clipboard";
 }
-@theme "gruvbox-dark-hard"
 * {
   background-color: #1a1a1a;
   foreground-color: #d4d4d4;
   border-color: #3a3a3a;
+  text-color: #d4d4d4;
 }
 window {
-  width: 480px;
+  width: 520px;
   border: 1;
   padding: 12;
 }
 listview { lines: 10; }
 element-selected { background-color: #2a2a2a; text-color: #ffffff; }
+inputbar { padding: 6; }
