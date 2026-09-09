@@ -1,0 +1,109 @@
+# arch-i3-minimal — i3 config
+# ThinkPad T14 Gen2i / Intel Xe / clean minimal, no compositor
+
+set $mod Mod4
+set $term alacritty
+set $menu rofi -show drun
+set $lock i3lock -c 1a1a1a
+
+font pango:JetBrainsMono Nerd Font 9
+
+# gaps (i3 >= 4.22 has gaps built in)
+gaps inner 4
+gaps outer 4
+smart_gaps on
+smart_borders on
+
+# colors — monochrome dark minimal
+set $bg     #1a1a1a
+set $bg2    #2a2a2a
+set $fg     #d4d4d4
+set $dim    #767676
+set $border #3a3a3a
+set $accent #808080
+
+client.focused          $accent $bg2 $fg $accent $accent
+client.focused_inactive $border $bg  $dim $border $border
+client.unfocused        $border $bg  $dim $border $border
+client.urgent           #5f0000 #900000 $fg #900000 #900000
+
+# bar: we use polybar, disable i3bar
+bar {
+  mode invisible
+}
+
+# autostart
+exec_always --no-startup-id ~/.config/polybar/launch.sh
+exec --no-startup-id feh --bg-fill ~/.wallpaper 2>/dev/null || xsetroot -solid "#1a1a1a"
+exec --no-startup-id dunst
+exec --no-startup-id nm-applet --indicator
+
+# keybinds
+bindsym $mod+Return exec $term
+bindsym $mod+r exec $menu
+bindsym $mod+l exec $lock
+bindsym $mod+Shift+q kill
+bindsym $mod+Shift+e exec "i3-msg exit"
+
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+bindsym $mod+h split h
+bindsym $mod+v split v
+bindsym $mod+f fullscreen toggle
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+space floating toggle
+bindsym $mod+Shift+space focus mode_toggle
+
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+
+# reload / restart
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+
+# screenshots (maim)
+bindsym Print exec maim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+bindsym Shift+Print exec maim -s ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
+
+# volume (pamixer + PipeWire/Pulse)
+bindsym XF86AudioRaiseVolume exec pamixer -i 5
+bindsym XF86AudioLowerVolume exec pamixer -d 5
+bindsym XF86AudioMute exec pamixer -t
+bindsym XF86AudioMicMute exec pamixer --default-source -t
+
+# brightness (ThinkPad)
+bindsym XF86MonBrightnessUp exec brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec brightnessctl set 5%-
+
+# media
+bindsym XF86AudioPlay exec playerctl play-pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+# touchpad tap + natural scroll off, faster key repeat
+exec --no-startup-id xset r rate 250 40

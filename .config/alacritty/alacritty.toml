@@ -1,0 +1,22 @@
+[general]
+import = []
+live_config_reload = true
+
+[window]
+padding = { x = 8, y = 8 }
+opacity = 1.0
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+size = 10.0
+
+[colors]
+primary = { background = "#1a1a1a", foreground = "#d4d4d4" }
+normal = { black = "#1a1a1a", red = "#cc6666", green = "#a3be8c", yellow = "#e7c547", blue = "#7e9cd8", magenta = "#9a7ecc", cyan = "#7dd0c6", white = "#d4d4d4" }
+bright = { black = "#525252", red = "#cc6666", green = "#a3be8c", yellow = "#e7c547", blue = "#7e9cd8", magenta = "#9a7ecc", cyan = "#7dd0c6", white = "#e8e8e8" }
+
+[cursor]
+style = "Beam"
+
+[mouse]
+hide_when_typing = true

@@ -1,0 +1,8 @@
+! arch-i3-minimal Xresources — ThinkPad T14 (14" 1080p/1440p safe)
+Xcursor.size: 24
+Xcursor.theme: Adwaita
+Xft.antialias: true
+Xft.hinting: true
+Xft.hintstyle: hintslight
+Xft.rgba: rgb
+Xft.dpi: 96
