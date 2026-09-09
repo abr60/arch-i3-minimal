@@ -12,6 +12,8 @@
 | Super+Ctrl+Q | calculator (rofi calc) |
 | Super+Ctrl+E | emoji picker (rofi emoji) |
 | Super+Ctrl+V | clipboard history (clipmenu) |
+| Super+A | launch default coding agent (arch-agent, like Omarchy) |
+| Super+Shift+Ctrl+A | agent picker (arch-agent --pick) |
 | Super+K | this keybind list |
 | Super+Ctrl+R | set reminder |
 

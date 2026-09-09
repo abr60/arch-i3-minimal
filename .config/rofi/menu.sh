@@ -147,12 +147,24 @@ setup-network)
   esac ;;
 
 setup-default)
-  case "$(pick 'Defaults' 'Browser' 'Editor' 'Terminal' 'File manager')" in
+  case "$(pick 'Defaults' 'Agent' 'Browser' 'Editor' 'Terminal' 'File manager')" in
+    Agent)    "$0" setup-default-agent ;;
     Browser)  B=$(pick 'Browser' 'firefox' 'chromium' 'google-chrome' 'brave'); [[ -n $B ]] && xdg-settings set default-web-browser "$B.desktop" 2>/dev/null; notify "Default" "Browser: $B" ;;
     Editor)   E=$(pick 'Editor' 'nvim' 'nano' 'code' 'zed'); [[ -n $E ]] && notify "Default" "Editor: $E (set \$EDITOR in ~/.bashrc)" ;;
     Terminal) T=$(pick 'Terminal' 'alacritty' 'foot' 'kitty' 'ghostty'); [[ -n $T ]] && notify "Default" "Terminal: $T (set in ~/.config/i3/config)" ;;
     'File manager') notify "Default" "thunar is default (xdg-mime)" ;;
   esac ;;
+
+setup-default-agent)
+  cur=$(arch-default-agent 2>/dev/null || cat ~/.config/arch-i3-minimal/defaults/agent 2>/dev/null || cat ~/.config/omarchy/defaults/agent 2>/dev/null || echo "")
+  mark() { [[ "$cur" == "$1" ]] && echo '✓' || echo ' '; }
+  AGENTS="opencode [$(mark opencode)]|claude [$(mark claude)]|codex [$(mark codex)]|gemini [$(mark gemini)]|copilot [$(mark copilot)]|crush [$(mark crush)]|cursor-agent [$(mark cursor-agent)]|muse [$(mark muse)]|pi [$(mark pi)]|omp [$(mark omp)]|grok [$(mark grok)]|hermes [$(mark hermes)]|openclaw [$(mark openclaw)]"
+  IFS='|' read -r -a LIST <<< "$AGENTS"
+  CH=$(printf '%s\n' "${LIST[@]}" | $ROFI 'Default Agent' -theme "$THEME")
+  # strip " [✓]" suffix
+  CHOICE=$(echo "$CH" | sed 's/ \[.*//')
+  [[ -n $CHOICE ]] && alacritty --class agent -e arch-default-agent "$CHOICE"
+  ;;
 
 setup-security)
   case "$(pick 'Security' 'Howdy face unlock' 'Fingerprint' 'SSHD' 'Passwordless sudo' 'Fido2')" in

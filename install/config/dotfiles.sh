@@ -19,4 +19,9 @@ chmod +x ~/.config/rofi/scripts/*.sh ~/.config/polybar/scripts/*.sh "$REPO/updat
 if [[ -f /usr/share/applications/thunar.desktop ]]; then
   xdg-mime default thunar.desktop inode/directory application/x-gnome-saved-search 2>/dev/null || true
 fi
+# bin wrappers → ~/.local/bin (for arch-agent etc)
+mkdir -p ~/.local/bin
+for b in "$REPO/bin"/*; do [[ -f $b ]] && ln -sfn "$b" ~/.local/bin/"$(basename "$b")" && chmod +x "$b"; done
+# agent skills → ~/.agents/skills etc (Omarchy pattern)
+"$REPO/install/config/skills.sh" 2>/dev/null || true
 ok "dotfiles linked — run 'startx' to launch i3"

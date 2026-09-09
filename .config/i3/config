@@ -32,8 +32,9 @@ client.focused_inactive $border $bg  $dim $border $border
 client.unfocused        $border $bg  $dim $border $border
 client.urgent           #5f0000 #900000 $fg #900000 #900000
 
-# floating terminals for pkg TUIs (Omarchy floating-presentation feel)
+# floating terminals for pkg TUIs + agent (Omarchy floating-presentation feel)
 for_window [class="^pkg$"] floating enable, resize set 900 600, move position center
+for_window [class="^agent$"] floating enable, resize set 1100 700, move position center
 
 # bar: we use polybar, disable i3bar
 bar {
@@ -62,6 +63,9 @@ bindsym $mod+Ctrl+v exec clipmenu
 bindsym $mod+Escape exec $menusys
 bindsym $mod+k exec alacritty -e less ~/arch-i3-minimal/docs/KEYBINDS.md
 bindsym $mod+Ctrl+r exec alacritty -e ~/.config/rofi/scripts/reminder.sh set
+# ---- agentic workflow (Omarchy parity) ----
+bindsym $mod+a exec arch-agent
+bindsym $mod+Shift+Ctrl+a exec arch-agent --pick
 
 # ---- window management (Omarchy style) ----
 bindsym $mod+w kill
