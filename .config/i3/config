@@ -66,6 +66,7 @@ bindsym $mod+Ctrl+r exec alacritty -e ~/.config/rofi/scripts/reminder.sh set
 # ---- agentic workflow (Omarchy parity) ----
 bindsym $mod+a exec arch-agent
 bindsym $mod+Shift+Ctrl+a exec arch-agent --pick
+bindsym $mod+grave exec rofi -show window
 
 # ---- window management (Omarchy style) ----
 bindsym $mod+w kill

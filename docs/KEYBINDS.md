@@ -14,6 +14,7 @@
 | Super+Ctrl+V | clipboard history (clipmenu) |
 | Super+A | launch default coding agent (arch-agent, like Omarchy) |
 | Super+Shift+Ctrl+A | agent picker (arch-agent --pick) |
+| Super+grave | window switcher (rofi -show window, Overview parity) |
 | Super+K | this keybind list |
 | Super+Ctrl+R | set reminder |
 
