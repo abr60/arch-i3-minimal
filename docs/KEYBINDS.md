@@ -1,15 +1,19 @@
 # KEYBINDS — Omarchy-ported reference (Super = Mod4 = Windows key)
 
-## Apps
+## Menu + Apps
 | Keys | Action |
 |------|--------|
+| Super+Space | launcher (rofi drun) |
+| Super+Alt+Space | central menu (menu.sh: trigger/style/setup/install/learn/update/about/system) |
+| Super+Escape | system menu (lock/suspend/logout/reboot/shutdown) |
 | Super+Enter | terminal (alacritty) |
 | Super+Shift+Enter | browser (firefox) |
 | Super+Shift+F | file manager (thunar) |
-| Super+Space | launcher (rofi drun) |
 | Super+Ctrl+Q | calculator (rofi calc) |
 | Super+Ctrl+E | emoji picker (rofi emoji) |
-| Super+Escape | power menu (lock/suspend/logout/reboot/shutdown) |
+| Super+Ctrl+V | clipboard history (clipmenu) |
+| Super+K | this keybind list |
+| Super+Ctrl+R | set reminder |
 
 ## Windows
 | Keys | Action |
@@ -31,15 +35,23 @@
 | Super+V | paste |
 | Super+X | cut |
 
+## Capture
+| Keys | Action |
+|------|--------|
+| Print | fullscreen screenshot |
+| Super+Print / Shift+Print | region screenshot |
+| Super+Ctrl+Print | OCR region → clipboard (tesseract) |
+| Super+Shift+Print | color picker → clipboard (xcolor) |
+| Alt+Print | screen record toggle (ffmpeg, ~/Videos) |
+
 ## System
 | Keys | Action |
 |------|--------|
-| Super+L | lock |
+| Super+L | lock (i3lock; auto-locks after 5 min idle + on suspend via xss-lock) |
 | Super+Shift+C | reload i3 |
 | Super+Shift+E | exit i3 |
 | Super+Ctrl+N | redshift toggle (night light) |
-| Print | fullscreen screenshot |
-| Super+Print / Shift+Print | region screenshot |
+| Polybar `UPD N` | click → runs update.sh (pacman -Syu + re-sync dotfiles) |
 
 ## Media (ThinkPad Fn keys)
 Volume via pamixer, brightness via brightnessctl (+5% steps, Shift = min/max),
