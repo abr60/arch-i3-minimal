@@ -62,7 +62,7 @@ bindsym $mod+Ctrl+e exec rofi -show emoji -modi emoji
 bindsym $mod+Ctrl+v exec clipmenu
 bindsym $mod+Escape exec $menusys
 bindsym $mod+k exec alacritty -e less ~/arch-i3-minimal/docs/KEYBINDS.md
-bindsym $mod+Ctrl+r exec alacritty -e ~/.config/rofi/scripts/reminder.sh set
+bindsym $mod+Ctrl+r exec alacritty -e arch-reminder set
 # ---- agentic workflow (Omarchy parity) ----
 bindsym $mod+a exec arch-agent
 bindsym $mod+Shift+Ctrl+a exec arch-agent --pick

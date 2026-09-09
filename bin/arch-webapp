@@ -1,0 +1,129 @@
+#!/bin/bash
+# arch-webapp — SSB desktop launcher (Omarchy omarchy-webapp-* port for i3/X11)
+# Usage: arch-webapp [install [name url [icon]]|launch <url>|remove [name]|list]
+set -euo pipefail
+ICON_DIR="$HOME/.local/share/icons/hicolor/256x256/apps"
+DESKTOP_DIR="$HOME/.local/share/applications"
+ROFI_THEME="$HOME/.config/rofi/config.rasi"
+BIN_NAME="arch-webapp" # symlinked to ~/.local/bin via dotfiles.sh
+
+safe_name() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^[:alnum:]]\+/-/g; s/^-//; s/-$//'; }
+ask() { printf '' | rofi -dmenu -p "$1" -theme "$ROFI_THEME" 2>/dev/null | xargs; }
+need_plain_name() { [[ $1 == */* ]] && echo "Name cannot contain '/': $1" >&2 && exit 1; }
+normalize_url() { local u="$1"; [[ $u != *://* ]] && u="https://$u"; printf '%s' "$u"; }
+require_http() {
+  [[ $1 =~ [[:space:]] ]] && echo "URL must not contain whitespace" >&2 && exit 1
+  [[ ${1,,} == http://* || ${1,,} == https://* ]] || { echo "URL must be http(s): $1" >&2; exit 1; }
+}
+fetch_icon() {
+  local url="$1" dest="$2"
+  local origin page icon_url
+  origin=$(sed -E 's|^(https?://[^/]+).*|\1|' <<<"$url")
+  page=$(curl -fsSL --max-time 5 "$url" 2>/dev/null | head -c 100000 | tr '\n' ' ') || page=""
+  icon_url=$(grep -oiE '<link[^>]*rel=["'\''][^"'\''"]*apple-touch-icon[^"'\''"]*["'\''][^>]*>' <<<"$page" | grep -oiE 'href=["'\''][^"'\''"]+' | head -1 | sed -E 's/^href=["'\'']//')
+  case $icon_url in http://*|https://*) ;; //*) icon_url="https:$icon_url" ;; /*) icon_url="$origin$icon_url" ;; ?*) icon_url="$origin/$icon_url" ;; esac
+  mkdir -p "$(dirname "$dest")"
+  { [[ -n $icon_url ]] && curl -fsSL --max-time 10 -o "$dest" "$icon_url" 2>/dev/null && [[ -s $dest ]]; } \
+    || curl -fsSL --max-time 10 -o "$dest" "$origin/apple-touch-icon.png" 2>/dev/null && [[ -s $dest ]] \
+    || curl -fsSL --max-time 10 -o "$dest" "https://www.google.com/s2/favicons?domain=${url}&sz=256" 2>/dev/null && [[ -s $dest ]]
+}
+
+webapp_install() {
+  local APP_NAME APP_URL ICON_REF INTERACTIVE ICON_VALUE
+  if (( $# >= 2 )); then
+    APP_NAME="$1"; APP_URL=$(normalize_url "$2"); ICON_REF="${3:-}"
+    require_http "$APP_URL"; need_plain_name "$APP_NAME"
+    INTERACTIVE=false
+  else
+    APP_NAME=$(ask "Webapp name")
+    [[ -z $APP_NAME ]] && exit 0; need_plain_name "$APP_NAME"
+    local _url; _url=$(ask "URL (https://...)")
+    [[ -z $_url ]] && exit 0; APP_URL=$(normalize_url "$_url"); require_http "$APP_URL"
+    ICON_REF=""; INTERACTIVE=true
+  fi
+  mkdir -p "$ICON_DIR" "$DESKTOP_DIR"
+  ICON_VALUE=$(safe_name "$APP_NAME")
+  if [[ -z $ICON_REF ]]; then
+    if fetch_icon "$APP_URL" "$ICON_DIR/$ICON_VALUE.png"; then ICON_REF="$ICON_VALUE"; gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" &>/dev/null || true
+    else
+      if [[ $INTERACTIVE == true ]]; then
+        ICON_REF=$(ask "Icon URL or name (enter to skip)")
+        if [[ $ICON_REF == https://* ]]; then
+          curl -fsSL --max-time 10 -o "$ICON_DIR/$ICON_VALUE.png" "$ICON_REF" 2>/dev/null || true
+          ICON_REF="$ICON_VALUE"; gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" &>/dev/null || true
+        elif [[ -n $ICON_REF && -f $ICON_REF ]]; then
+          cp "$ICON_REF" "$ICON_DIR/$ICON_VALUE.${ICON_REF##*.}"; ICON_REF="$ICON_VALUE"
+        elif [[ -n $ICON_REF ]]; then ICON_VALUE="$ICON_REF"
+        else ICON_REF="$ICON_VALUE"; fi
+      else ICON_REF="$ICON_VALUE"; fi
+    fi
+  elif [[ $ICON_REF == https://* || $ICON_REF == http://* ]]; then
+    curl -fsSL --max-time 10 -o "$ICON_DIR/$ICON_VALUE.png" "$ICON_REF" 2>/dev/null || true
+    gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" &>/dev/null || true
+    ICON_REF="$ICON_VALUE"
+  elif [[ -f $ICON_REF ]]; then
+    cp "$ICON_REF" "$ICON_DIR/$ICON_VALUE.${ICON_REF##*.}"; ICON_REF="$ICON_VALUE"
+  else ICON_VALUE=$(basename "$ICON_REF"); ICON_VALUE=${ICON_VALUE%.*}; ICON_VALUE=$(safe_name "$ICON_VALUE"); ICON_REF="$ICON_VALUE"
+  fi
+  esc() { local v="$1"; v=${v//\\/\\\\}; v=${v//$'\t'/\\t}; v=${v//$'\r'/\\r}; v=${v//$'\n'/\\n}; [[ $v == " "* ]] && v="\\s${v# }"; printf '%s' "$v"; }
+  local name_f exec_f icon_f
+  name_f=$(esc "$APP_NAME"); exec_f=$(esc "sh -c 'exec $BIN_NAME launch \"\$1\"' _ $APP_URL"); icon_f=$(esc "$ICON_REF")
+  cat > "$DESKTOP_DIR/$APP_NAME.desktop" <<EOF
+[Desktop Entry]
+Version=1.0
+Name=$name_f
+Comment=$name_f
+Exec=$exec_f
+Terminal=false
+Type=Application
+Icon=$icon_f
+StartupNotify=true
+EOF
+  chmod +x "$DESKTOP_DIR/$APP_NAME.desktop"
+  update-desktop-database "$DESKTOP_DIR" &>/dev/null || true
+  notify-send "Webapp installed" "$APP_NAME" 2>/dev/null || true
+  [[ $INTERACTIVE == true ]] && echo "Installed $APP_NAME — find it with Super+Space"
+}
+
+webapp_launch() {
+  local url="${1:?url required}"
+  for b in chromium google-chrome-stable brave brave-browser microsoft-edge chromium-browser; do
+    if command -v "$b" >/dev/null 2>&1; then exec "$b" --app="$url" "${@:2}"; fi
+  done
+  local browser_desktop; browser_desktop=$(xdg-settings get default-web-browser 2>/dev/null || echo "")
+  case "$browser_desktop" in google-chrome*|brave*|microsoft-edge*|chromium*|chrome*)
+    local exe; exe=$(sed -n 's/^Exec=\([^ ]*\).*/\1/p' {~/.local,~/.nix-profile,/usr}/share/applications/"$browser_desktop" 2>/dev/null | head -1)
+    [[ -n $exe && -x $exe ]] && exec "$exe" --app="$url" "${@:2}"
+    ;;
+  esac
+  if command -v firefox >/dev/null 2>&1; then exec firefox --ssb "$url" "${@:2}" 2>/dev/null || exec firefox --new-window "$url" "${@:2}"; fi
+  exec xdg-open "$url"
+}
+
+webapp_remove() {
+  mapfile -t APPS < <(grep -l "^Exec=.*$BIN_NAME launch" "$DESKTOP_DIR"/*.desktop 2>/dev/null | xargs -r -n1 basename | sed 's/\.desktop$//')
+  # fallback: old webapp-launch path
+  if (( ${#APPS[@]} == 0 )); then
+    mapfile -t APPS < <(grep -l '^Exec=.*webapp-launch' "$DESKTOP_DIR"/*.desktop 2>/dev/null | xargs -r -n1 basename | sed 's/\.desktop$//')
+  fi
+  if (( ${#APPS[@]} == 0 )); then notify-send "No webapps to remove" 2>/dev/null; echo "No webapps found."; exit 0; fi
+  local APP_NAME
+  if (( $# == 0 )); then
+    APP_NAME=$(printf '%s\n' "${APPS[@]}" | sort | rofi -dmenu -p "Remove webapp" -theme "$ROFI_THEME")
+  else APP_NAME="$*"; fi
+  [[ -z $APP_NAME ]] && exit 0
+  local icon; icon=$(printf '%s' "$APP_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^[:alnum:]]\+/-/g; s/^-//; s/-$//')
+  rm -f "$DESKTOP_DIR/$APP_NAME.desktop"
+  rm -f "$ICON_DIR/$icon.png" "$ICON_DIR/$APP_NAME.png"
+  update-desktop-database "$DESKTOP_DIR" &>/dev/null || true
+  notify-send "Webapp removed" "$APP_NAME" 2>/dev/null || true
+  echo "Removed $APP_NAME"
+}
+
+case "${1:-install}" in
+  install) shift; webapp_install "$@" ;;
+  launch)  shift; webapp_launch "$@" ;;
+  remove)  shift; webapp_remove "$@" ;;
+  list)    grep -l "^Exec=.*$BIN_NAME launch\|^Exec=.*webapp-launch" "$DESKTOP_DIR"/*.desktop 2>/dev/null | xargs -r -n1 basename | sed 's/\.desktop$//' | sort ;;
+  *) echo "Usage: arch-webapp [install [name url [icon]]|launch <url>|remove [name]|list]" >&2; exit 1 ;;
+esac

@@ -50,15 +50,15 @@ trigger)
     Hardware)          "$0" trigger-hardware ;;
     'Speed Test')      alacritty -e bash -c 'speedtest-cli 2>/dev/null || curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3; read -n1' ;;
     'Clipboard history') clipmenu ;;
-    'Color picker')    "$SCRIPT_DIR/scripts/capture.sh" color ;;
-    'OCR text')        "$SCRIPT_DIR/scripts/capture.sh" ocr ;;
+    'Color picker')    arch-capture color ;;
+    'OCR text')        arch-capture ocr ;;
   esac ;;
 
 trigger-reminder)
   case "$(pick 'Reminder' 'Set one' 'Show all' 'Clear all')" in
-    'Set one')  alacritty -e "$SCRIPT_DIR/scripts/reminder.sh" set ;;
-    'Show all') "$SCRIPT_DIR/scripts/reminder.sh" show ;;
-    'Clear all') "$SCRIPT_DIR/scripts/reminder.sh" clear ;;
+    'Set one')  alacritty -e arch-reminder set ;;
+    'Show all') arch-reminder show ;;
+    'Clear all') arch-reminder clear ;;
   esac ;;
 
 trigger-capture)
@@ -85,7 +85,7 @@ trigger-hardware)
     'Touchpad toggle') arch-toggle touchpad ;;
     'Touchscreen toggle') notify "Hardware" "Touchscreen toggle — xinput disable <id>" ;;
     'Laptop display toggle') alacritty -e bash -c 'xrandr --listmonitors; read -n1' ;;
-    Bluetooth) "$SCRIPT_DIR/scripts/bluetooth.sh" ;;
+    Bluetooth) arch-bluetooth ;;
   esac ;;
 
 toggle)
@@ -167,7 +167,7 @@ setup-default-agent)
 
 setup-security)
   case "$(pick 'Security' 'Howdy face unlock' 'Fingerprint' 'SSHD' 'Passwordless sudo' 'Fido2')" in
-    'Howdy face unlock') alacritty -e "$SCRIPT_DIR/scripts/setup-howdy.sh" ;;
+    'Howdy face unlock') alacritty -e arch-howdy ;;
     Fingerprint) alacritty -e bash -c 'fprintd-enroll 2>/dev/null || echo "fprintd not installed"; read -n1' ;;
     SSHD) alacritty -e bash -c 'sudo systemctl enable --now sshd; echo done; read -n1' ;;
     'Passwordless sudo') alacritty -e bash -c "echo '%wheel ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/wheel-nopasswd && echo OK && sleep 2" ;;
@@ -176,9 +176,9 @@ setup-security)
 
 install)
   case "$(pick 'Install' 'Package' 'AUR package' 'Web App' 'TUI (terminal app)' 'Nerd fonts' 'Service' 'Browser' 'Editor' 'Terminal' 'AI' 'Gaming' 'Development')" in
-    Package)      alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-install.sh" & ;;
-    'AUR package') alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-aur-install.sh" & ;;
-    'Web App')    "$SCRIPT_DIR/scripts/webapp-install.sh" ;;
+    Package)      alacritty --class pkg -e arch-pkg-install & ;;
+    'AUR package') alacritty --class pkg -e arch-pkg-aur-install & ;;
+    'Web App')    arch-webapp install ;;
     'TUI (terminal app)') alacritty -e bash -c 'read -p "TUI name> " n; read -p "Command> " c; echo "Use webapp-install logic for TUI .desktop with alacritty -e \$c"; read -n1' ;;
     'Nerd fonts')  alacritty -e bash -c "sudo pacman -S --needed ttf-jetbrains-mono-nerd ttf-cascadia-mono-nerd ttf-firacode-nerd ttf-iosevka-nerd; sleep 2" ;;
     Service)      "$0" install-service ;;
@@ -247,7 +247,7 @@ install-gaming)
     Lutris)     alacritty -e bash -c 'sudo pacman -S --needed lutris; read -n1' ;;
     Heroic)     alacritty -e bash -c 'yay -S --needed heroic-games-launcher-bin; read -n1' ;;
     'GeForce NOW') firefox 'https://www.nvidia.com/en-us/geforce-now/' & ;;
-    'Xbox Cloud') "$SCRIPT_DIR/scripts/webapp-install.sh" 'Xbox Cloud Gaming' 'https://www.xbox.com/play' ;;
+    'Xbox Cloud') arch-webapp install 'Xbox Cloud Gaming' 'https://www.xbox.com/play' ;;
   esac ;;
 
 install-development)
@@ -261,9 +261,9 @@ install-development)
 
 remove)
   case "$(pick 'Remove' 'Package' 'Orphaned packages' 'Web App' 'TUI' 'Theme' 'Browser' 'Service' 'Gaming')" in
-    Package)            alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-remove.sh" & ;;
-    'Orphaned packages') alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-orphans.sh" & ;;
-    'Web App')          "$SCRIPT_DIR/scripts/webapp-remove.sh" ;;
+    Package)            alacritty --class pkg -e arch-pkg-remove & ;;
+    'Orphaned packages') alacritty --class pkg -e arch-pkg-orphans & ;;
+    'Web App')          arch-webapp remove ;;
     TUI)  DESK=$(ls ~/.local/share/applications/*.desktop 2>/dev/null | xargs grep -l 'alacritty -e' | xargs -r basename -a | sed 's/.desktop//'); C=$(printf '%s\n' $DESK | $ROFI 'Remove TUI' -theme "$THEME"); [[ -n $C ]] && rm -v ~/.local/share/applications/"$C.desktop" ;;
     Theme) notify "Remove" "Themes are in ~/.config — delete manually" ;;
     Browser) "$0" remove-browser ;;

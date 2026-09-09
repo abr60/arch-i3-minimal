@@ -1,0 +1,28 @@
+#!/bin/bash
+# arch-reminder — tiny reminders via dunst (Omarchy omarchy-reminder port)
+# Usage: arch-reminder [set|show|clear]
+set -euo pipefail
+STORE="$HOME/.local/share/i3-reminders"
+mkdir -p "$(dirname "$STORE")"
+touch "$STORE"
+case "${1:-set}" in
+set)
+  # rofi-friendly prompts when not interactive; fallback to read when called from terminal
+  if [[ -t 0 ]]; then
+    echo "In how many minutes?"; read -r MIN; echo "Message?"; read -r MSG
+  else
+    MIN=$(printf '' | rofi -dmenu -p "Minutes" -theme "$HOME/.config/rofi/config.rasi" 2>/dev/null | xargs)
+    [[ -z $MIN ]] && exit 0
+    MSG=$(printf '' | rofi -dmenu -p "Message" -theme "$HOME/.config/rofi/config.rasi" 2>/dev/null | xargs)
+    [[ -z $MSG ]] && exit 0
+  fi
+  [[ "$MIN" =~ ^[0-9]+$ ]] || { echo "minutes must be a number" >&2; exit 1; }
+  ( sleep $((MIN * 60)) && notify-send 'Reminder' "$MSG" ) &
+  printf '%s|%s\n' "$(date -d "+$MIN min" '+%H:%M')" "$MSG" >> "$STORE"
+  echo "set: $MSG in $MIN min"
+  notify-send "Reminder" "$MSG in $MIN min" 2>/dev/null || true
+  ;;
+show) cat "$STORE" ;;
+clear) : > "$STORE"; echo "cleared"; notify-send "Reminder" "cleared" 2>/dev/null || true ;;
+*) echo "Usage: arch-reminder [set|show|clear]" >&2; exit 1 ;;
+esac

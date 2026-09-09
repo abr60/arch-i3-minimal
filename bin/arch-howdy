@@ -1,0 +1,31 @@
+#!/bin/bash
+# arch-howdy — install + configure howdy face unlock for i3lock (OPTIONAL, AUR-only)
+# Mirrors Omarchy setup > security. Never installed by default.
+# Usage: arch-howdy [install|status|add]
+set -euo pipefail
+case "${1:-install}" in
+status) howdy status 2>/dev/null || { echo "howdy not installed" >&2; exit 1; }; exit 0 ;;
+add) sudo howdy add; exit 0 ;;
+install|"")
+  ;;
+*) echo "Usage: arch-howdy [install|status|add]" >&2; exit 1 ;;
+esac
+if ! command -v howdy >/dev/null 2>&1; then
+  echo "== howdy is AUR-only. Installing (needs base-devel) =="
+  sudo pacman -S --needed base-devel cmake python-pip
+  TMP=$(mktemp -d)
+  git clone https://aur.archlinux.org/howdy.git "$TMP/howdy"
+  (cd "$TMP/howdy" && makepkg -si --noconfirm)
+  rm -rf "$TMP"
+  echo "== installed. Now configure: =="
+fi
+if ! command -v howdy >/dev/null 2>&1; then echo "howdy not found, abort" >&2; exit 1; fi
+echo "== enable IR camera + add howdy to i3lock PAM =="
+sudo python -m pip install --break-system-packages dlib 2>/dev/null || true
+if ! grep -q howdy /etc/pam.d/i3lock 2>/dev/null; then
+  echo "auth sufficient pam_python.so /lib/security/howdy/pam.py" | sudo tee -a /etc/pam.d/i3lock >/dev/null
+fi
+echo "== enroll your face (follow prompts) =="
+sudo howdy add
+echo "== done. Lock (Super+L) and look at the camera to test. =="
+howdy status 2>/dev/null || true
