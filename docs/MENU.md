@@ -5,28 +5,28 @@ Open with **Super+Alt+Space**. Recursive routes: `menu.sh [route]`.
 ```
 Menu
 ├── Apps        → rofi drun launcher
-├── Trigger     → Screenshot full / region, Record screen, Stop recording,
-│                 OCR text, Color picker, Emoji, Calculator, Reminder,
-│                 Clipboard history, Nightlight toggle, Bluetooth
-├── System      → Lock / Suspend / Logout / Reboot / Shutdown
-│                 (also direct: Super+Escape)
-├── Style       → Background (feh picker from ~/Pictures/wallpapers),
-│                 Toggle gaps, Reload i3
-├── Setup       → Security ▸ Howdy face unlock (AUR install + i3lock PAM,
-│                 optional, never installed by default)
-│                 Security ▸ Passwordless sudo (wheel NOPASSWD)
-│                 Edit i3 config / Edit menu
-├── Install     → Package (fzf TUI), AUR package (yay, auto-bootstrapped),
-│                 Howdy (AUR), Nerd fonts
-├── Remove      → Package (fzf explicit-only), Orphaned packages
-├── Learn       → Keybindings, Arch Wiki
-├── Update      → update.sh: pacman -Syu (+ yay -Sua) + git pull + re-link
-│                 (OVERWRITES local changes in ~/.config)
-└── About       → fastfetch
+├── Learn       → Keybindings, i3 Manual, Arch Wiki, Bash/Plybar/Rofi docs
+├── Trigger     → Emoji, Reminder (set/show/clear), Capture (screenshot/region/record/OCR/color/QR),
+│                 Share (clipboard/file/folder/localsend), Toggle…, Hardware (touchpad/touchscreen/display/BT),
+│                 Speed Test, Clipboard history, Color picker, OCR
+├── Toggle      → Touchpad / Stay Awake (xss-lock) / Menu Bar (polybar) / Notifications (dunst) / Nightlight / Gaps [✓]
+├── Style       → Background (feh picker ~/Pictures/wallpapers), Bar position Top/Bottom,
+│                 Transparency, Toggle gaps, Font, Screensaver text, Reload i3/polybar
+├── Setup       → Monitors, Keybindings, Network/DNS (nmtui, 1.1.1.1/8.8.8.8), Defaults (browser/editor/terminal),
+│                 Security (Howdy face unlock / fingerprint / SSHD / passwordless sudo / Fido2),
+│                 Edit i3/polybar/menu/rofi theme
+├── Install     → Package (fzf), AUR package (yay auto-bootstrap), Web App (SSB), TUI, Nerd fonts,
+│                 Service (1Password/Dropbox/Spotify/Signal/Tailscale), Browser (Chrome/Brave/Edge/Firefox/Zen),
+│                 Editor (VSCode/Cursor/Zed…), Terminal (Alacritty/Foot/Kitty/Ghostty),
+│                 AI (Ollama/LM Studio/Dictation), Gaming (Steam/RetroArch/Lutris…), Development (Rails/Docker/Go…)
+├── Remove      → Package, Orphaned packages, Web App, TUI, Theme, Browser, Service, Gaming
+├── Update      → System (pacman+yay), Dotfiles (git pull), Firmware, Timezone/Time, Password
+├── About       → fastfetch + repo link
+└── System      → Lock / Suspend / Hibernate / Logout / Reboot / Shutdown (also Super+Escape)
 ```
 
 Related scripts in `.config/rofi/scripts/`:
-capture.sh (ocr/color/record/stop), bluetooth.sh, reminder.sh (set/show/clear),
-setup-howdy.sh (install/status), toggle.sh (touchpad/idle/bar/notify/state),
-pkg-install.sh, pkg-aur-install.sh, pkg-remove.sh, pkg-orphans.sh (fzf TUIs).
-Thunar is the default file manager (Super+Shift+F, xdg-mime default in setup.sh).
+capture.sh (ocr/color/record/stop), bluetooth.sh, reminder.sh, setup-howdy.sh, toggle.sh,
+pkg-install.sh / pkg-aur-install.sh / pkg-remove.sh / pkg-orphans.sh (fzf TUIs),
+webapp-install.sh / webapp-launch.sh / webapp-remove.sh (SSB .desktop).
+Thunar default file manager (Super+Shift+F, xdg-mime in setup.sh).

@@ -1,27 +1,105 @@
+@import "matugen.rasi"
+
 configuration {
-  modi: "drun,run,window,calc,emoji";
-  show-icons: true;
-  icon-theme: "Yaru-sage";
-  font: "JetBrainsMono Nerd Font 11";
-  drun-display-format: "{name}";
-  display-drun: "Apps";
-  display-run: "Run";
-  display-window: "Windows";
-  display-calc: "Calc";
-  display-emoji: "Emoji";
-  calc-command: "echo -n '{result}' | xclip -selection clipboard";
+    modi: "drun,run,window,calc,emoji";
+    show-icons: true;
+    icon-theme: "Yaru-sage";
+    font: "JetBrainsMono Nerd Font 11";
+    matching: "prefix";
+    tokenize: false;
+    drun-match-fields: "name";
+    drun-display-format: "{name}";
+    display-drun: "Apps";
+    display-run: "Run";
+    display-window: "Windows";
+    display-calc: "Calc";
+    display-emoji: "Emoji";
+    calc-command: "echo -n '{result}' | xclip -selection clipboard";
+    kb-cancel: "Escape,MousePrimary";
+    hover-select: true;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
 }
+
 * {
-  background-color: #1a1a1a;
-  foreground-color: #d4d4d4;
-  border-color: #3a3a3a;
-  text-color: #d4d4d4;
+    background-color: transparent;
+    text-color:       @on-surface-variant;
+    font:             "JetBrainsMono Nerd Font 11";
 }
+
 window {
-  width: 520px;
-  border: 1;
-  padding: 12;
+    background-color: @surface;
+    border:           2px;
+    border-color:     @outline-variant;
+    border-radius:    1px;
+    width:            520px;
+    padding:          8px;
 }
-listview { lines: 10; }
-element-selected { background-color: #2a2a2a; text-color: #ffffff; }
-inputbar { padding: 6; }
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing:  12px;
+}
+
+inputbar {
+    background-color: @surface-container-low;
+    border:           1px;
+    border-color:     @outline-variant;
+    border-radius:    1px;
+    padding:          4px 12px;
+    children:         [ prompt, entry ];
+}
+
+prompt {
+    text-color: @outline;
+    margin:     0px 6px 0px 0px;
+}
+
+entry {
+    placeholder:       "";
+    placeholder-color: transparent;
+    text-color:        @on-surface-variant;
+}
+
+listview {
+    border:        1px;
+    border-radius: 1px;
+    border-color:  @outline-variant;
+    lines:         10;
+    columns:       1;
+    spacing:       0px;
+    fixed-height:  false;
+    scrollbar:     false;
+}
+
+element {
+    background-color: @surface-container-low;
+    border:           0px 0px 1px 0px;
+    border-color:     @outline-variant;
+    border-radius:    1px;
+    padding:          10px 14px;
+    orientation:      horizontal;
+    children:         [ element-text ];
+}
+
+element normal normal,
+element alternate normal {
+    background-color: @surface-container-low;
+    text-color:       @on-surface-variant;
+}
+
+element selected normal {
+    background-color: @surface-container-high;
+    text-color:       @on-surface;
+}
+
+element-icon {
+    enabled: false;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    vertical-align:   0.5;
+    expand:           true;
+}
