@@ -8,6 +8,7 @@ REPO="$HOME/arch-i3-minimal"
 
 echo "== 1/2 system packages =="
 sudo pacman -Syu --noconfirm
+command -v yay >/dev/null && yay -Sua --noconfirm
 
 echo "== 2/2 dotfiles (git pull + re-link, overwrites local changes) =="
 cd "$REPO"

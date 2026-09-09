@@ -16,14 +16,17 @@ Menu
 │                 optional, never installed by default)
 │                 Security ▸ Passwordless sudo (wheel NOPASSWD)
 │                 Edit i3 config / Edit menu
-├── Install     → Package (pacman -S), Howdy (AUR), Nerd fonts
+├── Install     → Package (fzf TUI), AUR package (yay, auto-bootstrapped),
+│                 Howdy (AUR), Nerd fonts
+├── Remove      → Package (fzf explicit-only), Orphaned packages
 ├── Learn       → Keybindings, Arch Wiki
-├── Update      → update.sh: pacman -Syu + git pull + re-link
+├── Update      → update.sh: pacman -Syu (+ yay -Sua) + git pull + re-link
 │                 (OVERWRITES local changes in ~/.config)
 └── About       → fastfetch
 ```
 
 Related scripts in `.config/rofi/scripts/`:
 capture.sh (ocr/color/record/stop), bluetooth.sh, reminder.sh (set/show/clear),
-setup-howdy.sh (install/status). Polybar side: `UPD N` module (click = update.sh),
-weather module (click = wttr.in).
+setup-howdy.sh (install/status), toggle.sh (touchpad/idle/bar/notify/state),
+pkg-install.sh, pkg-aur-install.sh, pkg-remove.sh, pkg-orphans.sh (fzf TUIs).
+Thunar is the default file manager (Super+Shift+F, xdg-mime default in setup.sh).

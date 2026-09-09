@@ -5,7 +5,7 @@ set -e
 sudo pacman -Syu --needed \
   i3-wm i3lock polybar \
   alacritty rofi rofi-calc rofi-emoji dunst \
-  nnn mpv maim feh fastfetch \
+  nnn mpv maim feh fastfetch fzf \
   brightnessctl playerctl pamixer pavucontrol \
   xclip xdotool udiskie redshift slop \
   clipmenu xss-lock tesseract tesseract-data-eng ffmpeg xcolor \

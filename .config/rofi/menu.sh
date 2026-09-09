@@ -13,7 +13,7 @@ pick() { # pick <prompt> <lines...> -> prints selection
 
 case "$ROUTE" in
 root)
-  case "$(pick 'Menu' 'Apps' 'Trigger' 'Toggle' 'System' 'Style' 'Setup' 'Install' 'Learn' 'Update' 'About')" in
+  case "$(pick 'Menu' 'Apps' 'Trigger' 'Toggle' 'System' 'Style' 'Setup' 'Install' 'Remove' 'Learn' 'Update' 'About')" in
     Apps)    rofi -show drun -theme "$THEME" ;;
     Trigger) "$0" trigger ;;
     Toggle)  "$0" toggle ;;
@@ -21,6 +21,7 @@ root)
     Style)   "$0" style ;;
     Setup)   "$0" setup ;;
     Install) "$0" install ;;
+    Remove)  "$0" remove ;;
     Learn)   "$0" learn ;;
     Update)  alacritty -e ~/arch-i3-minimal/update.sh ;;
     About)   alacritty -e fastfetch ;;
@@ -77,10 +78,16 @@ setup-security)
     'Passwordless sudo') alacritty -e bash -c "echo '%wheel ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/wheel-nopasswd && echo OK && sleep 2" ;;
   esac ;;
 install)
-  case "$(pick 'Install' 'Package' 'Howdy (AUR)' 'Nerd fonts')" in
-    Package)      PKG=$(printf '' | $ROFI 'pacman -S' -theme "$THEME"); [[ -n $PKG ]] && alacritty -e bash -c "sudo pacman -S --needed $PKG; sleep 3" ;;
+  case "$(pick 'Install' 'Package' 'AUR package' 'Howdy (AUR)' 'Nerd fonts')" in
+    Package)      alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-install.sh" & ;;
+    'AUR package') alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-aur-install.sh" & ;;
     'Howdy (AUR)') alacritty -e "$SCRIPT_DIR/scripts/setup-howdy.sh" install ;;
     'Nerd fonts')  alacritty -e bash -c "sudo pacman -S --needed ttf-jetbrains-mono-nerd ttf-cascadia-mono-nerd ttf-firacode-nerd; sleep 3" ;;
+  esac ;;
+remove)
+  case "$(pick 'Remove' 'Package' 'Orphaned packages')" in
+    Package)            alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-remove.sh" & ;;
+    'Orphaned packages') alacritty --class pkg -e "$SCRIPT_DIR/scripts/pkg-orphans.sh" & ;;
   esac ;;
 learn)
   case "$(pick 'Learn' 'Keybindings' 'Arch Wiki')" in

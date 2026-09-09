@@ -14,5 +14,9 @@ ln -sfn "$REPO/.Xresources" ~/.Xresources
 ln -sfn "$REPO/.xinitrc" ~/.xinitrc
 chmod +x ~/.config/polybar/launch.sh ~/.config/rofi/menu.sh
 chmod +x ~/.config/rofi/scripts/*.sh ~/.config/polybar/scripts/*.sh ~/arch-i3-minimal/update.sh 2>/dev/null || true
+# thunar = default file manager
+if [[ -f /usr/share/applications/thunar.desktop ]]; then
+  xdg-mime default thunar.desktop inode/directory application/x-gnome-saved-search 2>/dev/null || true
+fi
 mkdir -p ~/Pictures
 echo "Linked. Run 'startx' to launch i3."
