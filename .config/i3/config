@@ -66,7 +66,9 @@ bindsym $mod+j split toggle
 bindsym $mod+t floating toggle
 bindsym $mod+f fullscreen toggle
 bindsym $mod+s layout stacking
-bindsym $mod+Shift+space focus mode_toggle
+bindsym $mod+Shift+space exec ~/.config/rofi/scripts/toggle.sh bar
+# ---- toggles (Omarchy trigger.toggle port) ----
+bindsym XF86TouchpadToggle exec ~/.config/rofi/scripts/toggle.sh touchpad
 
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down

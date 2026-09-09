@@ -1,6 +1,6 @@
 #!/bin/bash
 # arch-i3-minimal menu — Omarchy-style central menu (rofi, recursive routes)
-# Usage: menu.sh [root|system|trigger|style|setup|setup-security|install|learn]
+# Usage: menu.sh [root|system|trigger|toggle|style|setup|setup-security|install|learn]
 ROUTE="${1:-root}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROFI="rofi -dmenu -p"
@@ -13,9 +13,10 @@ pick() { # pick <prompt> <lines...> -> prints selection
 
 case "$ROUTE" in
 root)
-  case "$(pick 'Menu' 'Apps' 'Trigger' 'System' 'Style' 'Setup' 'Install' 'Learn' 'Update' 'About')" in
+  case "$(pick 'Menu' 'Apps' 'Trigger' 'Toggle' 'System' 'Style' 'Setup' 'Install' 'Learn' 'Update' 'About')" in
     Apps)    rofi -show drun -theme "$THEME" ;;
     Trigger) "$0" trigger ;;
+    Toggle)  "$0" toggle ;;
     System)  "$0" system ;;
     Style)   "$0" style ;;
     Setup)   "$0" setup ;;
@@ -46,6 +47,17 @@ trigger)
     'Clipboard history') clipmenu ;;
     'Nightlight toggle') pkill redshift || redshift -l 0:0 -t 6500:3500 & ;;
     Bluetooth)           "$SCRIPT_DIR/scripts/bluetooth.sh" ;;
+  esac ;;
+toggle)
+  st=$("$SCRIPT_DIR/scripts/toggle.sh" state)
+  mark() { [[ $st == *"$1=on"* ]] && echo '✓' || echo ' '; }
+  TP="Touchpad [$(mark touchpad)]"; ID="Stay Awake [$(mark idle)]"
+  BR="Menu Bar [$(mark bar)]";   NT="Notifications [$(mark notify)]"
+  case "$(pick 'Toggle' "$TP" "$ID" "$BR" "$NT")" in
+    "$TP") "$SCRIPT_DIR/scripts/toggle.sh" touchpad ;;
+    "$ID") "$SCRIPT_DIR/scripts/toggle.sh" idle ;;
+    "$BR") "$SCRIPT_DIR/scripts/toggle.sh" bar ;;
+    "$NT") "$SCRIPT_DIR/scripts/toggle.sh" notify ;;
   esac ;;
 style)
   case "$(pick 'Style' 'Background' 'Toggle gaps' 'Reload i3')" in

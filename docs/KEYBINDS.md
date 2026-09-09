@@ -15,6 +15,12 @@
 | Super+K | this keybind list |
 | Super+Ctrl+R | set reminder |
 
+## Toggles (menu.sh ▸ Toggle shows ✓ state)
+| Keys | Action |
+|------|--------|
+| XF86TouchpadToggle | touchpad on/off |
+| Super+Shift+Space | polybar show/hide |
+
 ## Windows
 | Keys | Action |
 |------|--------|
