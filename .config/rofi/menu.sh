@@ -63,13 +63,13 @@ trigger-reminder)
 
 trigger-capture)
   case "$(pick 'Capture' 'Screenshot (full)' 'Screenshot (region)' 'Screenrecord (start)' 'Stop Screenrecording' 'OCR Text' 'QR Code' 'Color')" in
-    'Screenshot (full)') maim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png && notify "Screenshot" "Saved to ~/Pictures" ;;
-    'Screenshot (region)') maim -s ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png && notify "Screenshot" "Saved" ;;
-    'Screenrecord (start)') "$SCRIPT_DIR/scripts/capture.sh" record ;;
-    'Stop Screenrecording') "$SCRIPT_DIR/scripts/capture.sh" stop ;;
-    'OCR Text') "$SCRIPT_DIR/scripts/capture.sh" ocr ;;
-    'QR Code')  alacritty -e bash -c 'echo "QR: maim -s | zbarimg --raw - 2>/dev/null | xclip -sel clip; echo done; read -n1"' ;;
-    Color)      "$SCRIPT_DIR/scripts/capture.sh" color ;;
+    'Screenshot (full)') arch-capture screenshot full ;;
+    'Screenshot (region)') arch-capture screenshot region ;;
+    'Screenrecord (start)') arch-capture record ;;
+    'Stop Screenrecording') arch-capture stop ;;
+    'OCR Text') arch-capture ocr ;;
+    'QR Code')  arch-capture qr ;;
+    Color)      arch-capture color ;;
   esac ;;
 
 trigger-share)
@@ -82,46 +82,45 @@ trigger-share)
 
 trigger-hardware)
   case "$(pick 'Hardware' 'Touchpad toggle' 'Touchscreen toggle' 'Laptop display toggle' 'Bluetooth')" in
-    'Touchpad toggle') "$SCRIPT_DIR/scripts/toggle.sh" touchpad ;;
+    'Touchpad toggle') arch-toggle touchpad ;;
     'Touchscreen toggle') notify "Hardware" "Touchscreen toggle — xinput disable <id>" ;;
     'Laptop display toggle') alacritty -e bash -c 'xrandr --listmonitors; read -n1' ;;
     Bluetooth) "$SCRIPT_DIR/scripts/bluetooth.sh" ;;
   esac ;;
 
 toggle)
-  st=$("$SCRIPT_DIR/scripts/toggle.sh" state 2>/dev/null)
+  st=$(arch-toggle state 2>/dev/null)
   mark() { [[ $st == *"$1=on"* ]] && echo '✓' || echo ' '; }
   TP="Touchpad [$(mark touchpad)]"; ID="Stay Awake [$(mark idle)]"
   BR="Menu Bar [$(mark bar)]";   NT="Notifications [$(mark notify)]"
   NL="Nightlight [ ]"; GAP="Window Gaps [✓]"
-  # detect redshift/nightlight
   pgrep -x redshift >/dev/null && NL="Nightlight [✓]"
   CH=$(pick 'Toggle' "$TP" "$ID" "$BR" "$NT" "$NL" "$GAP" 'Battery %' 'Screensaver')
   case "$CH" in
-    "$TP") "$SCRIPT_DIR/scripts/toggle.sh" touchpad ;;
-    "$ID") "$SCRIPT_DIR/scripts/toggle.sh" idle ;;
-    "$BR") "$SCRIPT_DIR/scripts/toggle.sh" bar ;;
-    "$NT") "$SCRIPT_DIR/scripts/toggle.sh" notify ;;
-    "$NL") pkill redshift 2>/dev/null || redshift -l 0:0 -t 6500:3500 & ;;
-    "$GAP") i3-msg gaps inner current toggle 8 \; gaps outer current toggle 8 >/dev/null ;;
+    "$TP") arch-toggle touchpad ;;
+    "$ID") arch-toggle idle ;;
+    "$BR") arch-toggle bar ;;
+    "$NT") arch-toggle notify ;;
+    "$NL") arch-toggle nightlight ;;
+    "$GAP") arch-toggle gaps ;;
     'Battery %') notify "Battery" "$(cat /sys/class/power_supply/BAT0/capacity 2>/dev/null)% — toggles polybar battery module" ;;
-    Screensaver) pkill xss-lock 2>/dev/null || xss-lock -- i3lock -c 1a1a1a & ;;
+    Screensaver) arch-toggle screensaver ;;
   esac ;;
 
 style)
   case "$(pick 'Style' 'Background' 'Bar position' 'Transparency' 'Toggle gaps' 'Font' 'Screensaver text' 'Reload i3' 'Reload polybar')" in
-    Background)  BG=$(ls ~/Pictures/wallpapers/* 2>/dev/null | $ROFI 'Wallpaper' -theme "$THEME"); [[ -n $BG ]] && feh --bg-fill "$BG" && cp "$BG" ~/.wallpaper && notify "Style" "Wallpaper set" ;;
+    Background)  arch-theme bg next ;;
     'Bar position')
       case "$(pick 'Bar position' 'Top' 'Bottom')" in
-        Top) sed -i 's/^bottom = true/bottom = false/' ~/.config/polybar/config.ini; ~/.config/polybar/launch.sh & ;;
-        Bottom) sed -i 's/^bottom = false/bottom = true/' ~/.config/polybar/config.ini; ~/.config/polybar/launch.sh & ;;
+        Top) arch-theme bar top ;;
+        Bottom) arch-theme bar bottom ;;
       esac ;;
     Transparency) notify "Style" "Edit ~/.config/polybar/config.ini background alpha" ;;
-    'Toggle gaps') i3-msg gaps inner current toggle 8 \; gaps outer current toggle 8 >/dev/null ;;
-    Font) alacritty -e nano ~/.Xresources ;;
+    'Toggle gaps') arch-theme gaps ;;
+    Font) arch-theme font ;;
     'Screensaver text') alacritty -e nano ~/.config/i3/config ;;
-    'Reload i3') i3-msg reload ;;
-    'Reload polybar') ~/.config/polybar/launch.sh & ;;
+    'Reload i3') arch-theme reload i3 ;;
+    'Reload polybar') arch-theme reload polybar ;;
   esac ;;
 
 setup)
@@ -304,20 +303,20 @@ about)
 
 system)
   case "$(pick 'System' 'Lock' 'Suspend' 'Hibernate' 'Logout' 'Reboot' 'Shutdown' 'Screensaver')" in
-    Lock)        i3lock -c 1a1a1a ;;
-    Suspend)     systemctl suspend ;;
-    Hibernate)   systemctl hibernate 2>/dev/null || notify "System" "Hibernate not available" ;;
-    Logout)      i3-msg exit ;;
-    Reboot)      systemctl reboot ;;
-    Shutdown)    systemctl poweroff ;;
-    Screensaver) i3lock -c 1a1a1a ;;
+    Lock)        arch-system lock ;;
+    Suspend)     arch-system suspend ;;
+    Hibernate)   arch-system hibernate ;;
+    Logout)      arch-system logout ;;
+    Reboot)      arch-system reboot ;;
+    Shutdown)    arch-system shutdown ;;
+    Screensaver) arch-system screensaver ;;
   esac ;;
 
 update)
   case "$(pick 'Update' 'System (pacman + yay)' 'Dotfiles (git pull)' 'Firmware (fwupdmgr)' 'Timezone' 'Time' 'Password')" in
-    'System (pacman + yay)') alacritty -e bash -c "$REPO/update.sh; read -n1" ;;
-    'Dotfiles (git pull)') alacritty -e bash -c "cd $REPO && git pull --rebase && ./setup.sh; read -n1" ;;
-    'Firmware (fwupdmgr)') alacritty -e bash -c 'fwupdmgr refresh && fwupdmgr get-updates; read -n1' ;;
+    'System (pacman + yay)') alacritty -e bash -c "arch-update system; read -n1" ;;
+    'Dotfiles (git pull)') alacritty -e bash -c "arch-update dotfiles; read -n1" ;;
+    'Firmware (fwupdmgr)') alacritty -e bash -c 'arch-update firmware; read -n1' ;;
     Timezone) alacritty -e bash -c 'sudo tzselect 2>/dev/null || timedatectl list-timezones | rofi -dmenu -p Timezone | xargs -I{} sudo timedatectl set-timezone {}; read -n1' ;;
     Time) alacritty -e bash -c 'timedatectl status; read -n1' ;;
     Password) alacritty -e passwd ;;

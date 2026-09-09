@@ -74,9 +74,9 @@ bindsym $mod+j split toggle
 bindsym $mod+t floating toggle
 bindsym $mod+f fullscreen toggle
 bindsym $mod+s layout stacking
-bindsym $mod+Shift+space exec ~/.config/rofi/scripts/toggle.sh bar
+bindsym $mod+Shift+space exec arch-toggle bar
 # ---- toggles (Omarchy trigger.toggle port) ----
-bindsym XF86TouchpadToggle exec ~/.config/rofi/scripts/toggle.sh touchpad
+bindsym XF86TouchpadToggle exec arch-toggle touchpad
 
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
@@ -117,18 +117,18 @@ bindsym $mod+v exec "xdotool key --clearmodifiers Shift+Insert"
 bindsym $mod+x exec "xclip -selection clipboard -o | head -c 1000000 | xclip -selection clipboard -i; xdotool key --clearmodifiers Shift+Delete"
 
 # ---- system ----
-bindsym $mod+l exec $lock
+bindsym $mod+l exec arch-system lock
 bindsym $mod+Shift+c reload
-bindsym $mod+Shift+e exec "i3-msg exit"
-bindsym $mod+Ctrl+n exec "pkill redshift || redshift -l 0:0 -t 6500:3500 &"
+bindsym $mod+Shift+e exec arch-system logout
+bindsym $mod+Ctrl+n exec arch-toggle nightlight
 
-# ---- screenshots + capture (maim / tesseract / xcolor / ffmpeg) ----
-bindsym Print exec maim ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
-bindsym $mod+Print exec maim -s ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
-bindsym Shift+Print exec maim -s ~/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png
-bindsym $mod+Ctrl+Print exec ~/.config/rofi/scripts/capture.sh ocr
-bindsym $mod+Shift+Print exec ~/.config/rofi/scripts/capture.sh color
-bindsym Mod1+Print exec ~/.config/rofi/scripts/capture.sh record
+# ---- screenshots + capture (arch-capture) ----
+bindsym Print exec arch-capture screenshot full
+bindsym $mod+Print exec arch-capture screenshot region
+bindsym Shift+Print exec arch-capture screenshot region
+bindsym $mod+Ctrl+Print exec arch-capture ocr
+bindsym $mod+Shift+Print exec arch-capture color
+bindsym Mod1+Print exec arch-capture record
 
 # ---- volume (pamixer + PipeWire) ----
 bindsym XF86AudioRaiseVolume exec pamixer -i 5

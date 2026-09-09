@@ -1,0 +1,16 @@
+#!/bin/bash
+# arch-system — system actions (Omarchy omarchy-system-* port for i3/X11)
+# Usage: arch-system [lock|suspend|hibernate|logout|reboot|shutdown|screensaver|stats]
+set -euo pipefail
+case "${1:-}" in
+lock)        i3lock -c 1a1a1a 2>/dev/null || i3lock 2>/dev/null ;;
+suspend)     systemctl suspend ;;
+hibernate)   systemctl hibernate 2>/dev/null || { notify-send "System" "Hibernate not available" 2>/dev/null; exit 1; } ;;
+logout)      i3-msg exit ;;
+reboot)      systemctl reboot ;;
+shutdown|poweroff) systemctl poweroff ;;
+screensaver) i3lock -c 1a1a1a 2>/dev/null || i3lock 2>/dev/null ;;
+stats)       alacritty -e bash -c 'free -h; echo; uptime; echo; i3 --version; read -n1' ;;
+"") echo "Usage: arch-system [lock|suspend|hibernate|logout|reboot|shutdown|screensaver|stats]" >&2; exit 1 ;;
+*) echo "Unknown action: $1" >&2; exit 1 ;;
+esac

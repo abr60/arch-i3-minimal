@@ -1,0 +1,62 @@
+#!/bin/bash
+# arch-toggle — toggle desktop state (Omarchy omarchy-toggle-* port for i3/X11)
+# Usage: arch-toggle [touchpad|idle|bar|notify|nightlight|gaps|screensaver|state] [toggle|on|off]
+set -euo pipefail
+ACTION="${1:-}"; ARG="${2:-toggle}"
+
+touchpad_id() { xinput list --id-only "$(xinput list --name-only | grep -iE 'touchpad|trackpoint' | head -1)" 2>/dev/null || true; }
+touchpad_on() { xinput list-props "$(touchpad_id)" 2>/dev/null | grep -q 'Device Enabled.*1$'; }
+
+case "$ACTION" in
+touchpad)
+  id=$(touchpad_id); [[ -z $id ]] && { echo "no touchpad found" >&2; exit 1; }
+  case "$ARG" in on) xinput enable "$id";; off) xinput disable "$id";; *) if touchpad_on; then xinput disable "$id"; else xinput enable "$id"; fi;; esac
+  ;;
+idle)
+  case "$ARG" in
+    on)  pgrep -x xss-lock >/dev/null || { xss-lock -- i3lock -c 1a1a1a & disown; } ;;
+    off) pkill -x xss-lock 2>/dev/null || true ;;
+    *) if pgrep -x xss-lock >/dev/null; then pkill -x xss-lock; else xss-lock -- i3lock -c 1a1a1a & disown; fi ;;
+  esac
+  ;;
+bar)
+  case "$ARG" in
+    on)  pgrep -x polybar >/dev/null || { ~/.config/polybar/launch.sh & disown; } ;;
+    off) pkill -x polybar 2>/dev/null || true ;;
+    *) if pgrep -x polybar >/dev/null; then pkill -x polybar; else ~/.config/polybar/launch.sh & disown; fi ;;
+  esac
+  ;;
+notify)
+  dunstctl set-paused toggle 2>/dev/null || true
+  ;;
+nightlight)
+  case "$ARG" in
+    on)  pgrep -x redshift >/dev/null || { redshift -l 0:0 -t 6500:3500 & disown; } ;;
+    off) pkill -x redshift 2>/dev/null || true ;;
+    *) if pgrep -x redshift >/dev/null; then pkill -x redshift; else redshift -l 0:0 -t 6500:3500 & disown; fi ;;
+  esac
+  ;;
+gaps)
+  # toggle between tight (4) and roomy (8)
+  i3-msg gaps inner current toggle 8 \; gaps outer current toggle 8 >/dev/null 2>&1 || true
+  ;;
+screensaver)
+  case "$ARG" in
+    on)  pgrep -x xss-lock >/dev/null || { xss-lock -- i3lock -c 1a1a1a & disown; } ;;
+    off) pkill -x xss-lock 2>/dev/null || true ;;
+    *) if pgrep -x xss-lock >/dev/null; then pkill -x xss-lock; else xss-lock -- i3lock -c 1a1a1a & disown; fi ;;
+  esac
+  ;;
+state)
+  tp="off"; touchpad_on 2>/dev/null && tp="on"
+  idle="off"; pgrep -x xss-lock >/dev/null && idle="on"
+  bar="off"; pgrep -x polybar >/dev/null && bar="on"
+  ntf="on"; dunstctl is-paused 2>/dev/null | grep -q true && ntf="off"
+  nl="off"; pgrep -x redshift >/dev/null && nl="on"
+  printf 'touchpad=%s idle=%s bar=%s notify=%s nightlight=%s\n' "$tp" "$idle" "$bar" "$ntf" "$nl"
+  ;;
+*)
+  echo "Usage: arch-toggle [touchpad|idle|bar|notify|nightlight|gaps|screensaver|state] [toggle|on|off]" >&2
+  exit 1
+  ;;
+esac

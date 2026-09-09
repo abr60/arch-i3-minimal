@@ -1,0 +1,29 @@
+#!/bin/bash
+# arch-update — system + dotfiles updates (Omarchy omarchy-update* port)
+# Usage: arch-update [system|dotfiles|firmware|all] [--no-confirm]
+set -euo pipefail
+REPO="$HOME/arch-i3-minimal"
+[[ -d $REPO ]] || REPO="$(cd "$(dirname "$0")/.." && pwd)"
+MODE="${1:-all}"
+
+system_update() {
+  echo "== system packages =="
+  sudo pacman -Syu --noconfirm
+  command -v yay >/dev/null 2>&1 && yay -Sua --noconfirm || true
+}
+
+dotfiles_update() {
+  echo "== dotfiles (git pull + re-link, overwrites local ~/.config) =="
+  cd "$REPO"
+  git pull --rebase 2>/dev/null || echo "(no remote / offline — keeping local)"
+  ./setup.sh
+  i3-msg restart 2>/dev/null || true
+}
+
+case "$MODE" in
+system)   system_update ;;
+dotfiles) dotfiles_update ;;
+firmware) fwupdmgr refresh 2>/dev/null; fwupdmgr get-updates 2>/dev/null; read -n1 -p "Press any key..." ;;
+all)      system_update; dotfiles_update; echo "Done." ;;
+*) echo "Usage: arch-update [system|dotfiles|firmware|all]" >&2; exit 1 ;;
+esac

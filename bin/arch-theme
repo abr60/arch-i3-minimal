@@ -1,0 +1,63 @@
+#!/bin/bash
+# arch-theme — style/theme handling (Omarchy omarchy-theme-* port for i3/polybar)
+# Usage: arch-theme [bg [next|set <file>]|gaps [toggle]|bar [top|bottom|toggle]|reload [i3|polybar|all]|font]
+set -euo pipefail
+notify() { notify-send "$1" "${2:-}" 2>/dev/null || true; }
+WALLPAPER_DIR="$HOME/Pictures/wallpapers"
+WALLPAPER_LINK="$HOME/.wallpaper"
+ROFI_THEME="$HOME/.config/rofi/config.rasi"
+
+case "${1:-}" in
+bg)
+  sub="${2:-next}"
+  case "$sub" in
+    next)
+      # pick next wallpaper via rofi
+      if [[ ! -d $WALLPAPER_DIR ]]; then notify "Theme" "No $WALLPAPER_DIR"; exit 1; fi
+      bg=$(ls "$WALLPAPER_DIR"/* 2>/dev/null | rofi -dmenu -p "Wallpaper" -theme "$ROFI_THEME" 2>/dev/null || true)
+      [[ -n $bg ]] && feh --bg-fill "$bg" 2>/dev/null && cp "$bg" "$WALLPAPER_LINK" && notify "Theme" "Wallpaper set"
+      ;;
+    set)
+      f="${3:-}"; [[ -z $f ]] && { echo "arch-theme bg set <file>" >&2; exit 1; }
+      feh --bg-fill "$f" 2>/dev/null && cp "$f" "$WALLPAPER_LINK" && notify "Theme" "Wallpaper set"
+      ;;
+    *) echo "Usage: arch-theme bg [next|set <file>]" >&2; exit 1 ;;
+  esac
+  ;;
+gaps)
+  i3-msg gaps inner current toggle 8 \; gaps outer current toggle 8 >/dev/null 2>&1 || true
+  ;;
+bar)
+  sub="${2:-toggle}"
+  file="$HOME/.config/polybar/config.ini"
+  case "$sub" in
+    top)    sed -i 's/^bottom = true/bottom = false/' "$file" 2>/dev/null; ~/.config/polybar/launch.sh & disown; notify "Theme" "Bar: top" ;;
+    bottom) sed -i 's/^bottom = false/bottom = true/' "$file" 2>/dev/null; ~/.config/polybar/launch.sh & disown; notify "Theme" "Bar: bottom" ;;
+    toggle)
+      if grep -q '^bottom = true' "$file" 2>/dev/null; then
+        sed -i 's/^bottom = true/bottom = false/' "$file"; notify "Theme" "Bar: top"
+      else
+        sed -i 's/^bottom = false/bottom = true/' "$file"; notify "Theme" "Bar: bottom"
+      fi
+      ~/.config/polybar/launch.sh & disown
+      ;;
+    *) echo "Usage: arch-theme bar [top|bottom|toggle]" >&2; exit 1 ;;
+  esac
+  ;;
+reload)
+  sub="${2:-all}"
+  case "$sub" in
+    i3)       i3-msg reload ;;
+    polybar)  ~/.config/polybar/launch.sh & disown ;;
+    all)      i3-msg reload 2>/dev/null; ~/.config/polybar/launch.sh & disown ;;
+    *) echo "Usage: arch-theme reload [i3|polybar|all]" >&2; exit 1 ;;
+  esac
+  ;;
+font)
+  alacritty -e nano ~/.Xresources 2>/dev/null || nano ~/.Xresources
+  ;;
+*)
+  echo "Usage: arch-theme [bg|gaps|bar|reload|font]" >&2
+  exit 1
+  ;;
+esac

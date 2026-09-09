@@ -18,11 +18,12 @@
 | Super+K | this keybind list |
 | Super+Ctrl+R | set reminder |
 
-## Toggles (menu.sh ▸ Toggle shows ✓ state)
+## Toggles (menu.sh ▸ Toggle shows ✓ state — `arch-toggle`)
 | Keys | Action |
 |------|--------|
-| XF86TouchpadToggle | touchpad on/off |
-| Super+Shift+Space | polybar show/hide |
+| XF86TouchpadToggle | touchpad on/off (`arch-toggle touchpad`) |
+| Super+Shift+Space | polybar show/hide (`arch-toggle bar`) |
+| Super+Ctrl+N | night light toggle (`arch-toggle nightlight`) |
 
 ## Windows
 | Keys | Action |
@@ -44,23 +45,22 @@
 | Super+V | paste |
 | Super+X | cut |
 
-## Capture
+## Capture (`arch-capture`)
 | Keys | Action |
 |------|--------|
-| Print | fullscreen screenshot |
+| Print | fullscreen screenshot (`arch-capture screenshot full`) |
 | Super+Print / Shift+Print | region screenshot |
-| Super+Ctrl+Print | OCR region → clipboard (tesseract) |
-| Super+Shift+Print | color picker → clipboard (xcolor) |
+| Super+Ctrl+Print | OCR region → clipboard |
+| Super+Shift+Print | color picker → clipboard |
 | Alt+Print | screen record toggle (ffmpeg, ~/Videos) |
 
-## System
+## System (`arch-system` / `arch-update`)
 | Keys | Action |
 |------|--------|
-| Super+L | lock (i3lock; auto-locks after 5 min idle + on suspend via xss-lock) |
+| Super+L | lock (`arch-system lock`; auto 5 min idle + suspend via xss-lock) |
 | Super+Shift+C | reload i3 |
-| Super+Shift+E | exit i3 |
-| Super+Ctrl+N | redshift toggle (night light) |
-| Polybar `UPD N` | click → runs update.sh (pacman -Syu + re-sync dotfiles) |
+| Super+Shift+E | exit i3 (`arch-system logout`) |
+| Polybar `UPD N` | click → `arch-update system` (pacman -Syu + yay + dotfiles re-sync) |
 
 ## Media (ThinkPad Fn keys)
 Volume via pamixer, brightness via brightnessctl (+5% steps, Shift = min/max),

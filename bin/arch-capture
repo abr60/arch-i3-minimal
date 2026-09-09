@@ -1,0 +1,80 @@
+#!/bin/bash
+# arch-capture — screenshots / recording / OCR / color (Omarchy omarchy-capture-* port for i3/X11)
+# Usage: arch-capture [screenshot [full|region]|record|stop|ocr|color|qr]
+set -euo pipefail
+PIDFILE=/tmp/i3-record.pid
+mkdir -p ~/Videos ~/Pictures
+
+notify() { notify-send "$1" "${2:-}" 2>/dev/null || true; }
+
+case "${1:-}" in
+screenshot|"")
+  mode="${2:-full}"
+  out="$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+  if [[ $mode == "region" ]]; then
+    maim -s "$out" && notify "Screenshot" "Saved to $out" && echo "$out"
+  else
+    maim "$out" && notify "Screenshot" "Saved to $out" && echo "$out"
+  fi
+  ;;
+region)
+  out="$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+  maim -s "$out" && notify "Screenshot" "Saved to $out" && echo "$out"
+  ;;
+ocr)
+  txt=$(maim -s 2>/dev/null | tesseract stdin stdout -l eng 2>/dev/null || true)
+  if [[ -n $txt ]]; then
+    printf '%s' "$txt" | xclip -selection clipboard
+    notify "OCR" "Text copied to clipboard"
+    printf '%s\n' "$txt"
+  fi
+  ;;
+color)
+  hex=$(xcolor 2>/dev/null | head -1 || true)
+  if [[ -n $hex ]]; then
+    printf '%s' "$hex" | xclip -selection clipboard
+    notify "Color" "$hex copied"
+    printf '%s\n' "$hex"
+  fi
+  ;;
+qr)
+  if command -v zbarimg >/dev/null 2>&1; then
+    txt=$(maim -s 2>/dev/null | zbarimg --raw - 2>/dev/null || true)
+    if [[ -n $txt ]]; then
+      printf '%s' "$txt" | xclip -selection clipboard
+      notify "QR" "$txt"
+      printf '%s\n' "$txt"
+    fi
+  else
+    echo "zbarimg not installed (pacman -S zbar)" >&2
+    exit 1
+  fi
+  ;;
+record)
+  if [[ -f $PIDFILE ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+    notify "Recording" "Already recording — use arch-capture stop"
+    exit 1
+  fi
+  command -v slop >/dev/null || { notify "Recording" "slop not installed"; exit 1; }
+  geo=$(slop -f '%x,%y %w %h' 2>/dev/null) || exit 1
+  xy="${geo% *}"; wh="${geo#* }"
+  out="$HOME/Videos/record-$(date +%Y%m%d-%H%M%S).mp4"
+  ffmpeg -y -f x11grab -video_size "$wh" -i ":0.0+$xy" -f pulse -i default "$out" &>/dev/null &
+  echo $! > "$PIDFILE"
+  notify "Recording" "$out"
+  ;;
+stop)
+  if [[ -f $PIDFILE ]]; then
+    kill "$(cat "$PIDFILE")" 2>/dev/null || true
+    rm -f "$PIDFILE"
+    notify "Recording" "Stopped"
+  else
+    # also try pkill ffmpeg x11grab
+    pkill -f "ffmpeg.*x11grab" 2>/dev/null && notify "Recording" "Stopped" || true
+  fi
+  ;;
+*)
+  echo "Usage: arch-capture [screenshot [full|region]|region|record|stop|ocr|color|qr]" >&2
+  exit 1
+  ;;
+esac

@@ -25,8 +25,9 @@ Menu
 └── System      → Lock / Suspend / Hibernate / Logout / Reboot / Shutdown (also Super+Escape)
 ```
 
-Related scripts in `.config/rofi/scripts/`:
-capture.sh (ocr/color/record/stop), bluetooth.sh, reminder.sh, setup-howdy.sh, toggle.sh,
-pkg-install.sh / pkg-aur-install.sh / pkg-remove.sh / pkg-orphans.sh (fzf TUIs),
-webapp-install.sh / webapp-launch.sh / webapp-remove.sh (SSB .desktop).
-Thunar default file manager (Super+Shift+F, xdg-mime in setup.sh).
+Delegating `bin/` (Omarchy-parity, also callable from keybinds/CLI):
+`arch-capture` (screenshot/ocr/color/record/qr), `arch-toggle` (touchpad/idle/bar/notify/nightlight/gaps),
+`arch-system` (lock/suspend/logout/reboot…), `arch-theme` (bg/bar/gaps/reload), `arch-update` (system/dotfiles/firmware),
+`arch-agent`/`arch-default-agent` (Omarchy agent workflow).
+Legacy `.config/rofi/scripts/` kept for pkg/webapp/bluetooth/reminder TUIs: bluetooth.sh, reminder.sh, setup-howdy.sh,
+pkg-install.sh / pkg-aur-install.sh / pkg-remove.sh / pkg-orphans.sh, webapp-install/launch/remove.sh.
